@@ -115,7 +115,7 @@ and set `--gpu` option to gpu ids that will be used.
 
 
 ### D. Evaluation
-Check [evaluations/Readme.md](evaluations/Readme.md).
+Check [evaluations/Readme.md](https://github.com/riiid/PPAP/tree/main/evaluations).
 
 
 ## BibTex
