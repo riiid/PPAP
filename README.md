@@ -74,8 +74,14 @@ For example, above finetuning off-the-shelf models with DDP on `0, 1, 2, 3` gpus
  mpiexec -n 4 python python_scripts/classifier_train.py --log_path [directory for logging] --data_dir [ImageNet1k training dataset path] --method "finetune" $MODEL_FLAGS $CLASSIFIER_FLAGS --gpus 0 1 2 3
 ```
 
+### C Trained checkpoint
+| Model    |                                                             Finetune                                                             |                                                                                                                                                                                                                                                                                                                             Multi-experts-5                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                                                                PPAP-5                                                                                                                                                                                                                                                                                                                 | 
+|:---------|:--------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| ResNet50 | [Model](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/finetune/resnet50_finetune.ckpt) | experts [[0, 200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/0_max5.ckpt), [[200, 400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/1_max5.ckpt), [[400, 600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/2_max5.ckpt) [[600, 800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/3_max5.ckpt) [[800, 1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/4_max5.ckpt) | experts [[0, 200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/0_max5.ckpt), [[200, 400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/1_max5.ckpt), [[400, 600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/2_max5.ckpt) [[600, 800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/3_max5.ckpt) [[800, 1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/4_max5.ckpt) |
+| DeiT-S   |                                                               TBD                                                                |                                                                                                                                                                                                                                                                                                                                   TBD                                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                  TBD                                                                                                                                                                                                                                                                                                                  | 
 
-### C. Sampling with classifier guidance
+
+### D. Sampling with classifier guidance
 Our code supports sampling with guidance from 1) finetuned model 2) multi-experts 3) PPAP.
 
 1. Finetune
@@ -103,18 +109,18 @@ Our code supports sampling with guidance from 1) finetuned model 2) multi-expert
    python python_scripts/classifier_sample.py --log_path [sampling_path] $MODEL_FLAGS $SAMPLE_FLAGS $MODEL_PATH_FLAGS --method "ppap" --gpus 0
    ```
 
-#### C.1 Sampling configuration.
+#### D.1 Sampling configuration.
 1. DDIM: To sample by DDIM with `t` steps, set `--timestep_respacing ` as `ddimt`.
 2. DDPM: DDPM with `t` steps is enabled when `--timestep_respacing` is set as `t`.
 
 
-#### C.2 DDP for sampling.
+#### D.2 DDP for sampling.
 Because of slow sampling speed, we recommend to use DDP for sampling. 
 For using DDP with `k` gpus, please add command `mpiexec -n k` in front of python execution command, 
 and set `--gpu` option to gpu ids that will be used.
 
 
-### D. Evaluation
+### E. Evaluation
 Check [evaluations/Readme.md](evaluations/Readme.md).
 
 
