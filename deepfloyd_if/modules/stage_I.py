@@ -48,3 +48,30 @@ class IFStageI(IFBaseModule):
             positive_mixer=positive_mixer,
             **kwargs
         )
+
+    def uncond_generation(
+        self,
+        batch_size=1,
+        sample_loop="ddpm",
+        sample_timestep_respacing='150',
+        dynamic_thresholding_p=0.95,
+        dynamic_thresholding_c=1.5,
+        aspect_ratio='1:1',
+        progress=True,
+        seed=None,
+        sample_fn=None,
+        **kwargs,
+    ):
+        return super().uncond_generation(
+            batch_size=batch_size,
+            sample_loop=sample_loop,
+            sample_timestep_respacing=sample_timestep_respacing,
+            dynamic_thresholding_c=dynamic_thresholding_c,
+            dynamic_thresholding_p=dynamic_thresholding_p,
+            img_size=64,
+            aspect_ratio=aspect_ratio,
+            progress=progress,
+            seed=seed,
+            sample_fn=sample_fn,
+            **kwargs
+        )

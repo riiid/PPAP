@@ -44,3 +44,36 @@ class IFStageII(IFBaseModule):
             sample_fn=sample_fn,
             **kwargs
         )
+
+    def uncond_generation(
+        self,
+        low_res=None,
+        batch_size=1,
+        sample_loop="ddpm",
+        sample_timestep_respacing='smart50',
+        dynamic_thresholding_p=0.95,
+        dynamic_thresholding_c=1.0,
+        aug_level=0.25,
+        blur_sigma=None,
+        img_scale=4.0,
+        aspect_ratio='1:1',
+        progress=True,
+        seed=None,
+        sample_fn=None,
+        **kwargs,
+    ):
+        return super().uncond_generation(
+            low_res=low_res,
+            batch_size=batch_size,
+            aug_level=aug_level,
+            dynamic_thresholding_p=dynamic_thresholding_p,
+            dynamic_thresholding_c=dynamic_thresholding_c,
+            sample_loop=sample_loop,
+            sample_timestep_respacing=sample_timestep_respacing,
+            img_size=256,
+            img_scale=img_scale,
+            progress=progress,
+            seed=seed,
+            sample_fn=sample_fn,
+            **kwargs
+        )

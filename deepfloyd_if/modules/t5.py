@@ -18,7 +18,8 @@ class T5Embedder:
 
     def __init__(self, device, dir_or_name='t5-v1_1-xxl', *, cache_dir=None, hf_token=None, use_text_preprocessing=True,
                  t5_model_kwargs=None, torch_dtype=None, use_offload_folder=None):
-        self.device = torch.device(device)
+        # self.device = torch.device(device)
+        self.device = device
         self.torch_dtype = torch_dtype or torch.bfloat16
         if t5_model_kwargs is None:
             t5_model_kwargs = {'low_cpu_mem_usage': True, 'torch_dtype': self.torch_dtype}

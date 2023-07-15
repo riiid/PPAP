@@ -19,6 +19,7 @@ This repository is based on following repositories with some modifications:
 For distributed training, [MPICH](https://www.mpich.org/) should be installed with following commands.
 ```
 apt install mpich
+pip install git+https://github.com/openai/CLIP.git --no-deps
 ```
 
 For installing required python packages, use this commands.
@@ -120,10 +121,11 @@ Check [evaluations/Readme.md](evaluations/Readme.md).
 
 
 ## PPAP with various models for DeepFloyd-IF.
+### A. Prepare pre-trained model weight of DeepFloyd-IF.
 
+### B. Generate unconditional image dataset for PPAP.
 
-
-
+### C. Plug-in
 
 ## BibTex
 ```

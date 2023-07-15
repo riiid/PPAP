@@ -59,13 +59,123 @@ class IFBaseModule:
         self.cache_dir = cache_dir or os.path.expanduser('~/.cache/IF_')
         self.dir_or_name = dir_or_name
         self.conf = self.load_conf(dir_or_name) if not self.use_diffusers else None
-        self.device = torch.device(device)
+        # self.device = torch.device(device)
+        self.device = device
         self.zero_emb = self.cpu_zero_emb.clone().to(self.device)
         self.pil_img_size = pil_img_size
 
     @property
     def use_diffusers(self):
         return False
+
+    def uncond_generation(
+        self,
+        low_res=None,
+        batch_size=1,
+        sample_loop="ddpm",
+        sample_timestep_respacing='smart185',
+        dynamic_thresholding_p=0.95,
+        dynamic_thresholding_c=1.5,
+        aug_level=0.25,
+        blur_sigma=None,
+        img_size=None,
+        img_scale=4.0,
+        aspect_ratio='1:1',
+        progress=True,
+        seed=None,
+        sample_fn=None,
+        support_noise=None,
+        support_noise_less_qsample_steps=0,
+        inpainting_mask=None,
+        **kwargs,
+    ):
+        self._clear_cache()
+        image_w, image_h = self._get_image_sizes(low_res, img_size, aspect_ratio, img_scale)
+        diffusion = self.get_diffusion(sample_timestep_respacing)
+
+        def model_fn(x_t, ts, **kwargs):
+            model_out = self.model(x_t, ts, **kwargs)
+            eps, rest = model_out[:, :3], model_out[:, 3:]
+            return torch.cat([eps, rest], dim=1)
+
+        seed = self.seed_everything(seed)
+        metadata = {
+            'seed': seed,
+            'dynamic_thresholding_p': dynamic_thresholding_p,
+            'dynamic_thresholding_c': dynamic_thresholding_c,
+            'batch_size': batch_size,
+            'device_name': self.device_name,
+            'img_size': [image_w, image_h],
+            'sample_loop': sample_loop,
+            'sample_timestep_respacing': sample_timestep_respacing,
+            'stage': self.stage,
+        }
+        list_text_emb = [self.zero_emb.unsqueeze(0).repeat(batch_size, 1, 1).to(self.device, dtype=self.model.dtype)]
+        model_kwargs = dict(
+            text_emb=torch.cat(list_text_emb, dim=0).to(self.device, dtype=self.model.dtype),
+            timestep_text_emb=None,
+            use_cache=True,
+        )
+        if low_res is not None:
+            if blur_sigma is not None:
+                low_res = T.GaussianBlur(3, sigma=(blur_sigma, blur_sigma))(low_res)
+            model_kwargs['low_res'] = torch.cat([low_res], dim=0).to(self.device)
+            model_kwargs['aug_level'] = aug_level
+
+        if support_noise is None:
+            noise = torch.randn(
+                (batch_size, 3, image_h, image_w), device=self.device, dtype=self.model.dtype)
+        else:
+            assert support_noise_less_qsample_steps < len(diffusion.timestep_map) - 1
+            assert support_noise.shape == (1, 3, image_h, image_w)
+            q_sample_steps = torch.tensor([int(len(diffusion.timestep_map) - 1 - support_noise_less_qsample_steps)])
+            support_noise = support_noise.cpu()
+            noise = support_noise.clone()
+            noise[inpainting_mask.cpu().bool() if inpainting_mask is not None else ...] = diffusion.q_sample(
+                support_noise[inpainting_mask.cpu().bool() if inpainting_mask is not None else ...],
+                q_sample_steps,
+            )
+            noise = noise.repeat(batch_size, 1, 1, 1).to(device=self.device, dtype=self.model.dtype)
+
+        if inpainting_mask is not None:
+            inpainting_mask = inpainting_mask.to(device=self.device, dtype=torch.long)
+
+        if sample_loop == 'ddpm':
+            with torch.no_grad():
+                sample = diffusion.p_sample_loop(
+                    model_fn,
+                    (batch_size, 3, image_h, image_w),
+                    noise=noise,
+                    clip_denoised=True,
+                    model_kwargs=model_kwargs,
+                    dynamic_thresholding_p=dynamic_thresholding_p,
+                    dynamic_thresholding_c=dynamic_thresholding_c,
+                    inpainting_mask=inpainting_mask,
+                    device=self.device,
+                    progress=progress,
+                    sample_fn=sample_fn,
+                )[:batch_size]
+        elif sample_loop == 'ddim':
+            with torch.no_grad():
+                sample = diffusion.ddim_sample_loop(
+                    model_fn,
+                    (batch_size, 3, image_h, image_w),
+                    noise=noise,
+                    clip_denoised=True,
+                    model_kwargs=model_kwargs,
+                    dynamic_thresholding_p=dynamic_thresholding_p,
+                    dynamic_thresholding_c=dynamic_thresholding_c,
+                    device=self.device,
+                    progress=progress,
+                    sample_fn=sample_fn,
+                )[:batch_size]
+        else:
+            raise ValueError(f'Sample loop "{sample_loop}" doesnt support')
+
+        # sample = self.__validate_generations(sample)
+        self._clear_cache()
+
+        return sample, metadata
 
     def embeddings_to_image(
         self, t5_embs, low_res=None, *,
@@ -159,6 +269,7 @@ class IFBaseModule:
         if negative_t5_embs is not None:
             list_text_emb.append(negative_t5_embs.to(self.device))
         else:
+            # Here is unconditional token for generation.
             list_text_emb.append(
                 self.zero_emb.unsqueeze(0).repeat(batch_size, 1, 1).to(self.device, dtype=self.model.dtype))
 
@@ -223,7 +334,7 @@ class IFBaseModule:
         else:
             raise ValueError(f'Sample loop "{sample_loop}" doesnt support')
 
-        sample = self.__validate_generations(sample)
+        # sample = self.__validate_generations(sample)
         self._clear_cache()
 
         return sample, metadata
