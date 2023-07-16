@@ -1,9 +1,15 @@
 import argparse
 
+from guided_diffusion import dist_util, logger
 
 
 def main():
-    return
+    args = create_argparser().parse_args()
+    dist_util.setup_dist(args.gpus)
+    logger.configure(dir=args.log_path)
+
+    logger.log("create diffusion")
+
 
 
 def create_argparser():
