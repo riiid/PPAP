@@ -125,7 +125,7 @@ def main():
             image_size=args.image_size,
             class_cond=False,
             deterministic=False,
-            random_crop=True,
+            random_crop=False,
             random_flip=True,
             num_workers=args.num_workers
         )
@@ -193,12 +193,12 @@ def main():
             else:
                 data, extra = batch
                 data = data.to(dist_util.dev())
-                with torch.no_grad():
-                    data_for_origin_classifier = normalize((data + 1)/2)
-                    output_origin = classifier(data_for_origin_classifier)
-                    t, _ = schedule_sampler.sample(data_for_origin_classifier.shape[0], dist_util.dev())
-                    forward_img = diffusion.q_sample(data, t)
                 with torch.cuda.amp.autocast(enabled=args.mixed_precision):
+                    with torch.no_grad():
+                        data_for_origin_classifier = normalize((data + 1) / 2)
+                        output_origin = classifier(data_for_origin_classifier)
+                        t, _ = schedule_sampler.sample(data_for_origin_classifier.shape[0], dist_util.dev())
+                        forward_img = diffusion.q_sample(data, t)
                     output = model(forward_img)
                     KD_loss = torch.nn.KLDivLoss(reduction="none")(
                         F.log_softmax(output, dim=1),

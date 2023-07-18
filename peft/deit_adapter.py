@@ -9,6 +9,8 @@ class AdapterWrapperDEIT(nn.Module):
         self.add_adapter(adapter_class, gamma, lora_alpha)
         self.model_frozen = False
         self.freeze_model(True)
+        from guided_diffusion.script_util import get_image_normalization
+        self.normalization = get_image_normalization("DEIT")
 
     def add_adapter(self, adapter_class, gamma, lora_alpha):
         """
@@ -47,6 +49,7 @@ class AdapterWrapperDEIT(nn.Module):
 
 
     def forward(self, x):
+        x = self.normalization((1 + x) / 2)
         return self.deit(x)
 
 
@@ -86,7 +89,7 @@ class AdapterWrapperDEIT(nn.Module):
 
 if __name__ == "__main__":
     from peft.lora import LoRALinear
-    from guided_diffusion.script_util import create_pretrained_classifier
+    from guided_diffusion.script_util import create_pretrained_classifier, get_image_normalization
     import torch
     adapter_class = LoRALinear
     deit = create_pretrained_classifier(classifier_name="DEIT")

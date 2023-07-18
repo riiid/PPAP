@@ -50,7 +50,7 @@ class LoRALinear(LoRALayer):
         self.lora_A = nn.Parameter(self.linear.weight.new_zeros((r, in_features)))
         self.lora_B = nn.Parameter(self.linear.weight.new_zeros((out_features, r)))
         self.scaling = self.lora_alpha / self.r
-
+        self.reset_parameters()
 
     def reset_parameters(self):
         nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
