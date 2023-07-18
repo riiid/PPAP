@@ -9,6 +9,7 @@ class AdapterWrapperMidas(nn.Module):
         self.add_adapter(adapter_class, gamma, lora_alpha)
         self.model_frozen = False
         self.freeze_model(True)
+        self.calculate_training_parameter_ratio()
         self.normalize = T.Compose(
             [
                 T.Resize((256, 256)),
@@ -86,7 +87,7 @@ class AdapterWrapperMidas(nn.Module):
 
     def forward(self, x):
         x = self.normalize((1 + x) / 2)
-        return self.resnet(x)
+        return self.midas(x)
 
     def freeze_model(self, freeze=True):
         """Freezes all weights of the model."""

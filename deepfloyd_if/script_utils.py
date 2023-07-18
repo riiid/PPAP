@@ -1,13 +1,13 @@
 """
 Handling arguments like guided diffusion code.
 """
-from deepfloyd_if.modules import IFStageI
 import torch
 
 from peft.midas_adapter import AdapterWrapperMidas
 
 
 def create_model_and_diffusion(token):
+    from deepfloyd_if.modules import IFStageI
     if token:
         from huggingface_hub import login
         login(token=token)
@@ -24,6 +24,7 @@ def create_guidance_model(task_name):
     else:
         raise NotImplementedError
 
+
 def add_adapter_for_guidance_model(task_name, model, lora_alpha, gamma):
     if task_name == "depth":
         from peft.lora import LoraConv2d
@@ -32,3 +33,16 @@ def add_adapter_for_guidance_model(task_name, model, lora_alpha, gamma):
     else:
         raise NotImplementedError
     return adapter_model
+
+
+def get_image_normalization(task_name):
+    if task_name == "depth":
+        import torchvision.transforms as T
+        normalize = T.Compose([
+            T.Normalize(
+                    mean=(0.485, 0.456, 0.406),
+                    std=(0.229, 0.224, 0.225)
+                )])
+        return normalize
+    else:
+        raise NotImplementedError
