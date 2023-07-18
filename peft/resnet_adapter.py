@@ -77,11 +77,11 @@ class AdapterWrapperResNet(nn.Module):
                         p.requires_grad = True
                 elif "bn" in n:
                     p.requires_grad = True
-            self.model_frozen = freeze
         else:
             # Unfreeze
             for n, p in self.named_parameters():
                 p.requires_grad = True
+        self.model_frozen = freeze
 
 
     def adapter_state_dict(self):
