@@ -10,6 +10,10 @@ This repository is based on following repositories with some modifications:
 - [microsoft/LoRA](https://github.com/microsoft/LoRA)
 - [DeepFloyd/IF](https://github.com/deep-floyd/IF)
 
+## Plan
+- [x] Release code.
+- [x] Make checkpoints available.
+- [ ] Make PPAP data available.
 
 ## Requirements
 For distributed training, [MPICH](https://www.mpich.org/) should be installed with following commands.
