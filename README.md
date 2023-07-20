@@ -133,6 +133,13 @@ Check [evaluations/Readme.md](evaluations/Readme.md).
 
 
 ## PPAP with various models for DeepFloyd-IF.
+| Baseimage                                | Depth map                                            | PPAP Depth Guided Image | PPAP Depth Guided + "Dog" prompt Image                                                                 | 
+|------------------------------------------|------------------------------------------------------|--|--------------------------------------------------------------------------------------------------------|
+| ![](asset/generated_samples/baseimg.png) | ![depth.png](asset%2Fgenerated_samples%2Fdepth.png)  | ![uncond_depth_guidance.png](asset%2Fgenerated_samples%2Funcond_depth_guidance.png)| ![text_to_img_depth_guidance_dog.png](asset%2Fgenerated_samples%2Ftext_to_img_depth_guidance_dog.png)  |
+
+
+
+
 We provide the codes for depth guidance with Midas for [DeepFloyd-IF](https://github.com/deep-floyd/IF).
 Deepfloyd-IF is similar to GLIDE model which is used in our paper, but can create 1024x1024 higher quality images than GLIDE.
 From this reason, we change the target diffusion model as DeepFloyd-IF in released code for offering high quality images.
@@ -163,7 +170,7 @@ mpiexec -n [number_of_gpus] python python_scripts/deepfloyd_guidance_ppap.py --i
 experts [[0,200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/0_max5.ckpt) [[200,400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/1_max5.ckpt) [[400,600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/2_max5.ckpt) [[600,800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/3_max5.ckpt) [[800,1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/4_max5.ckpt)
 
 ### E. Generating samples
-Please refer [```deepfloyd_guidance_ppap.ipynb```](), which contains examples for depth guidance with PPAP.
+Please refer [```deepfloyd_guidance_ppap.ipynb```](https://github.com/riiid/PPAP/blob/main/deepfloyd_guidance_ppap.ipynb), which contains examples for depth guidance with PPAP.
 
 ### F. Used dataset in DeepFloyd-IF PPAP
 The generated dataset produced in [B. Generate unconditional image dataset for PPAP.](#b-generate-unconditional-image-dataset-for-ppap) can be download in [link]().
