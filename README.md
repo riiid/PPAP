@@ -28,7 +28,7 @@ pip install -r requirements.txt
 ```
 
 
-## Imagenet Class Guidance for ADM
+# Imagenet Class Guidance for ADM
 
 ### A. Prepare pre-trained diffusion models.
 For the pre-trained diffusion model, we use ADM which trained on imagenet 256x256 dataset.
@@ -136,7 +136,7 @@ and set `--gpu` option to gpu ids that will be used.
 Check [evaluations/Readme.md](evaluations/Readme.md).
 
 
-## PPAP with various models for DeepFloyd-IF.
+# PPAP with various models for DeepFloyd-IF.
 | Baseimage                                | Depth map                                            | PPAP Depth Guided Image | PPAP Depth Guided + "Dog" prompt Image                                                                 | 
 |------------------------------------------|------------------------------------------------------|--|--------------------------------------------------------------------------------------------------------|
 | ![](asset/generated_samples/baseimg.png) | ![depth.png](asset%2Fgenerated_samples%2Fdepth.png)  | ![uncond_depth_guidance.png](asset%2Fgenerated_samples%2Funcond_depth_guidance.png)| ![text_to_img_depth_guidance_dog.png](asset%2Fgenerated_samples%2Ftext_to_img_depth_guidance_dog.png)  |
