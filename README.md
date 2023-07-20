@@ -8,11 +8,7 @@ This repository contains the code for guidance with 1) Finetuned models on forwa
 This repository is based on following repositories with some modifications: 
 - [openai/guided-diffusion](https://github.com/openai/guided-diffusion)
 - [microsoft/LoRA](https://github.com/microsoft/LoRA)
-
-
-## Plan
-- [x] Release code.
-- [ ] Make checkpoints available.
+- [DeepFloyd/IF](https://github.com/deep-floyd/IF)
 
 
 ## Requirements
@@ -79,7 +75,9 @@ For example, above finetuning off-the-shelf models with DDP on `0, 1, 2, 3` gpus
 | Model    |                                                             Finetune                                                             |                                                                                                                                                                                                                                                                                                                             Multi-experts-5                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                                                                PPAP-5                                                                                                                                                                                                                                                                                                                 | 
 |:---------|:--------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | ResNet50 | [Model](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/finetune/resnet50_finetune.ckpt) | experts [[0, 200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/0_max5.ckpt), [[200, 400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/1_max5.ckpt), [[400, 600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/2_max5.ckpt) [[600, 800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/3_max5.ckpt) [[800, 1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/multi_experts/4_max5.ckpt) | experts [[0, 200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/0_max5.ckpt), [[200, 400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/1_max5.ckpt), [[400, 600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/2_max5.ckpt) [[600, 800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/3_max5.ckpt) [[800, 1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/ResNet50/ppap_5/4_max5.ckpt) |
-| DeiT-S   |                                                               TBD                                                                |                                                                                                                                                                                                                                                                                                                                   TBD                                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                  TBD                                                                                                                                                                                                                                                                                                                  | 
+| DeiT-S   |   [Model](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/finetune/deits_finetune.ckpt)    |  experts [[0, 200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/multi_experts/0_max5.ckpt), [[200, 400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/multi_experts/1_max5.ckpt), [[400, 600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/multi_experts/2_max5.ckpt) [[600, 800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/multi_experts/3_max5.ckpt) [[800, 1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/multi_experts/4_max5.ckpt)  |  experts [[0, 200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/ppap_5/0_max5.ckpt), [[200, 400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/ppap_5/1_max5.ckpt), [[400, 600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/ppap_5/2_max5.ckpt) [[600, 800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/ppap_5/3_max5.ckpt) [[800, 1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/DeiT-S/ppap_5/4_max5.ckpt)  |
+
+
 
 
 ### D. Sampling with classifier guidance
@@ -125,13 +123,38 @@ and set `--gpu` option to gpu ids that will be used.
 Check [evaluations/Readme.md](evaluations/Readme.md).
 
 
-
 ## PPAP with various models for DeepFloyd-IF.
+We provide the codes for depth guidance with Midas for [DeepFloyd-IF](https://github.com/deep-floyd/IF).
+Deepfloyd-IF is similar to GLIDE model which is used in our paper, but can create 1024x1024 higher quality images than GLIDE.
+From this reason, we change the target diffusion model as DeepFloyd-IF in released code for offering high quality images.
+
 ### A. Prepare pre-trained model weight of DeepFloyd-IF.
+First step is preparing pretrained checkpoint of DeepFloyd-IF.
+Please refer the repository of DeepFloyd-IF ([Link](https://github.com/deep-floyd/IF)) and get the access token of hugging face.
+
+Then, set `hf_token` argument of following python command as your access token. 
 
 ### B. Generate unconditional image dataset for PPAP.
+For finetune off-the-shelf models with PPAP framework, we should generate synthetic images from unconditional diffusion models.
+The following command will generate these data from deepfloyd-IF:
+```
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+mpiexec -n [number_of_gpus] python python_scripts/generate_dataset_deepfloyd.py --stage 2 --num_samples 500000 --gpus ["gpu_ids"] --log_path ["Directory for saving the dataset"] --batch_size [batch_size] --hf_token ["your token"]
+```
 
-### C. Plug-in
+### C. PPAP-finetune Midas
+Following command will finetune Midas as the guidance model with PPAP framework.
+```
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+mpiexec -n [number_of_gpus] python python_scripts/deepfloyd_guidance_ppap.py --iterations 300000 --batch_size 64 --gpus ["gpu_ids"] --log_path ["path for logging directory"]
+```
+
+### D. Trained checkpoints
+
+experts [[0,200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/0_max5.ckpt) [[200,400]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/1_max5.ckpt) [[400,600]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/2_max5.ckpt) [[600,800]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/3_max5.ckpt) [[800,1000]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/deepfloyd_midas/4_max5.ckpt)
+
+### E. Generating samples
+Please refer [```deepfloyd_guidance_ppap.ipynb```](), which contains examples for depth guidance with PPAP.
 
 ## BibTex
 ```

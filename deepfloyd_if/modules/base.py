@@ -316,6 +316,7 @@ class IFBaseModule:
                     device=self.device,
                     progress=progress,
                     sample_fn=sample_fn,
+                    guidance_fn=kwargs.get("guidance_fn", None)
                 )[:batch_size]
         elif sample_loop == 'ddim':
             with torch.no_grad():
@@ -330,6 +331,7 @@ class IFBaseModule:
                     device=self.device,
                     progress=progress,
                     sample_fn=sample_fn,
+                    guidance_fn=kwargs.get("guidance_fn", None)
                 )[:batch_size]
         else:
             raise ValueError(f'Sample loop "{sample_loop}" doesnt support')

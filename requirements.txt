@@ -19,3 +19,6 @@ sentencepiece~=0.1.97
 ftfy~=6.1.1
 beautifulsoup4~=4.11.1
 protobuf==3.19.0
+jupyter
+xformers==0.0.16
+git+https://github.com/openai/CLIP.git

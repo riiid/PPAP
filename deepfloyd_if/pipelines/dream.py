@@ -31,6 +31,8 @@ def dream(
         "guidance_scale": 7.0, [1.0, 20.0] control the level of text understanding
         "positive_mixer": 0.25, [0.0, 1.0] contribution of the second positive prompt, 0.0 - minimum, 1.0 - maximum
         "sample_timestep_respacing": "150", see available modes IFBaseModule.respacing_modes or use custom
+        "guidance_grad_func: function for calculating guidance gradient"
+        "classifier_guidance_scale": 10.0,
 
     :param optional dict if_II_kwargs:
         "dynamic_thresholding_p": 0.95, [0.5, 1.0] it controls color saturation on high cfg values

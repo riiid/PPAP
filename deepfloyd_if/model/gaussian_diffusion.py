@@ -362,9 +362,31 @@ class GaussianDiffusion:
             return t.float() * (1000.0 / self.num_timesteps)
         return t
 
+
+    def condition_mean(self, guidance_fn, p_mean_var, x, t, model_kwargs=None):
+        """
+        Compute the mean for the previous step, given a function cond_fn that
+        computes the gradient of a conditional log probability with respect to
+        x. In particular, cond_fn computes grad(log(p(y|x))), and we want to
+        condition on y.
+
+        This uses the conditioning strategy from Sohl-Dickstein et al. (2015).
+        """
+        gradient, scale = guidance_fn(x, self._scale_timesteps(t), **model_kwargs)
+        gradient = gradient.detach()
+        # adjust guidance gradient norm
+        with torch.no_grad():
+            mean_norm = p_mean_var["mean"][:1].norm()
+            grad_norm = gradient.norm()
+            gradient = gradient / grad_norm * mean_norm * scale
+        new_mean = (
+            p_mean_var["mean"].float() + p_mean_var["variance"] * gradient.float()
+        )
+        return new_mean
+
     def p_sample(
         self, model, x, t, clip_denoised=True, dynamic_thresholding_p=0.99, dynamic_thresholding_c=1.7,
-        denoised_fn=None, model_kwargs=None, inpainting_mask=None,
+        denoised_fn=None, model_kwargs=None, inpainting_mask=None, guidance_fn=None
     ):
         """
         Sample x_{t-1} from the model at the given timestep.
@@ -396,7 +418,10 @@ class GaussianDiffusion:
         )  # no noise when t == 0
         if inpainting_mask is None:
             inpainting_mask = torch.ones_like(x, device=x.device)
-
+        if guidance_fn is not None:
+            out["mean"] = self.condition_mean(
+                guidance_fn, out, x, t, model_kwargs=model_kwargs
+            )
         sample = out['mean'] + nonzero_mask * torch.exp(0.5 * out['log_variance']) * noise
         sample = (1 - inpainting_mask)*x + inpainting_mask*sample
         return {'sample': sample, 'pred_xstart': out['pred_xstart']}
@@ -415,6 +440,7 @@ class GaussianDiffusion:
         device=None,
         progress=False,
         sample_fn=None,
+        guidance_fn=None
     ):
         """
         Generate samples from the model.
@@ -445,6 +471,7 @@ class GaussianDiffusion:
             model_kwargs=model_kwargs,
             device=device,
             progress=progress,
+            guidance_fn=guidance_fn
         )):
             if sample_fn is not None:
                 sample = sample_fn(step_idx, sample)
@@ -464,6 +491,7 @@ class GaussianDiffusion:
         model_kwargs=None,
         device=None,
         progress=False,
+        guidance_fn=None
     ):
         """
         Generate samples from the model and yield intermediate samples from
@@ -500,9 +528,26 @@ class GaussianDiffusion:
                     denoised_fn=denoised_fn,
                     inpainting_mask=inpainting_mask,
                     model_kwargs=model_kwargs,
+                    guidance_fn=guidance_fn
                 )
                 yield out
                 img = out['sample']
+
+    def condition_score(self, guidance_fn, p_mean_var, x, t, model_kwargs=None):
+        alpha_bar = _extract_into_tensor(self.alphas_cumprod, t, x.shape)
+
+        eps = self._predict_eps_from_xstart(x, t, p_mean_var["pred_xstart"])
+        eps = eps - (1 - alpha_bar).sqrt() * guidance_fn(
+            x, self._scale_timesteps(t), **model_kwargs
+        )
+
+        out = p_mean_var.copy()
+        out["pred_xstart"] = self._predict_xstart_from_eps(x, t, eps)
+        out["mean"], _, _ = self.q_posterior_mean_variance(
+            x_start=out["pred_xstart"], x_t=x, t=t
+        )
+        return out
+
 
     def ddim_sample(
         self,
@@ -515,6 +560,7 @@ class GaussianDiffusion:
         denoised_fn=None,
         model_kwargs=None,
         eta=0.0,
+        guidance_fn=None,
     ):
         """
         Sample x_{t-1} from the model using DDIM.
@@ -530,6 +576,9 @@ class GaussianDiffusion:
             denoised_fn=denoised_fn,
             model_kwargs=model_kwargs,
         )
+        if guidance_fn is not None:
+            out = self.condition_score(guidance_fn, out, x, t, model_kwargs)
+
         # Usually our model outputs epsilon, but we re-derive it
         # in case we used x_start or x_prev prediction.
         eps = self._predict_eps_from_xstart(x, t, out['pred_xstart'])
@@ -608,6 +657,7 @@ class GaussianDiffusion:
         progress=False,
         eta=0.0,
         sample_fn=None,
+        guidance_fn=None,
     ):
         """
         Generate samples from the model using DDIM.
@@ -626,6 +676,7 @@ class GaussianDiffusion:
             device=device,
             progress=progress,
             eta=eta,
+            guidance_fn=guidance_fn
         )):
             if sample_fn is not None:
                 sample = sample_fn(step_idx, sample)
@@ -645,6 +696,7 @@ class GaussianDiffusion:
         device=None,
         progress=False,
         eta=0.0,
+        guidance_fn=None
     ):
         """
         Use DDIM to sample from the model and yield intermediate samples from
@@ -679,6 +731,7 @@ class GaussianDiffusion:
                     denoised_fn=denoised_fn,
                     model_kwargs=model_kwargs,
                     eta=eta,
+                    guidance_fn=guidance_fn
                 )
                 yield out
                 img = out['sample']
