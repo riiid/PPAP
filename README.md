@@ -52,12 +52,21 @@ Here is commands for these.
    python python_scripts/classifier_train.py --log_path [directory for logging] --data_dir [ImageNet1k training dataset path] $MODEL_FLAGS $CLASSIFIER_FLAGS --gpus 0 --n_experts [Number of experts] --method "multi_experts"
    ```
 3. PPAP.
-   ```
-   export PYTHONPATH=$PYTHONPATH:$(pwd)
-   MODEL_FLAGS="--iterations 300000 --anneal_lr True --batch_size 256 --lr 1e-4 --weight_decay 0.05 --save_interval 10000"
-   CLASSIFIER_FLAGS="--image_size 256 --classifier_name [classifier name: ResNet18, ResNet50, ResNet152, DEIT] --lora_alpha 8 --gamma 16"
-   python python_scripts/classifier_train.py --log_path [directory for logging] --data_dir [ImageNet1k training dataset path] $MODEL_FLAGS $CLASSIFIER_FLAGS  --gpus 0 --n_experts [Number of experts] --method "ppap"
-   ```
+   - For finetune off-the-shelf models with PPAP framework, we should generate synthetic images from unconditional diffusion models.
+   - The following command will generate these data from ADM unconditional 256x256 diffusion model:
+      ```
+     SAMPLE_FLAGS="--batch_size 100 --num_samples 500000  --timestep_respacing ddim25 --use_ddim True"
+     MODEL_FLAGS="--attention_resolutions 32,16,8 --class_cond False --diffusion_steps 1000 --image_size 256 --learn_sigma True --noise_schedule linear --num_channels 256 --num_head_channels 64 --num_res_blocks 2 --resblock_updown True --use_fp16 True --use_scale_shift_norm True"
+     mpiexec -n [number of gpus] python python_scripts/generate_dataset.py --log_path [path for saving dataset] $MODEL_FLAGS $SAMPLE_FLAGS --gpus [Gpu ids] --model_path [diffusion_path]
+     ```
+   - Instead of this, you can download generated data from ADM unconditional 256x256 diffusion model from [link]()
+   - Then, this command will train PPAP with synthetic data.
+      ```
+      export PYTHONPATH=$PYTHONPATH:$(pwd)
+      MODEL_FLAGS="--iterations 300000 --anneal_lr True --batch_size 256 --lr 1e-4 --weight_decay 0.05 --save_interval 10000"
+      CLASSIFIER_FLAGS="--image_size 256 --classifier_name [classifier name: ResNet18, ResNet50, ResNet152, DEIT] --lora_alpha 8 --gamma 16"
+      python python_scripts/classifier_train.py --log_path [directory for logging] --data_dir [Synthetic data path] $MODEL_FLAGS $CLASSIFIER_FLAGS  --gpus 0 --n_experts [Number of experts] --method "ppap"
+      ```
 
 #### B.1 Enabling DDP for training
 If mpich is installed, distributed data parallel (DDP) can be enabled for training.
@@ -155,6 +164,9 @@ experts [[0,200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CV
 
 ### E. Generating samples
 Please refer [```deepfloyd_guidance_ppap.ipynb```](), which contains examples for depth guidance with PPAP.
+
+### F. Used dataset in DeepFloyd-IF PPAP
+The generated dataset produced in [B. Generate unconditional image dataset for PPAP.](#b-generate-unconditional-image-dataset-for-ppap) can be download in [link]().
 
 ## BibTex
 ```
