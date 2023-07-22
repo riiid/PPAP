@@ -63,7 +63,7 @@ Here is commands for these.
      MODEL_FLAGS="--attention_resolutions 32,16,8 --class_cond False --diffusion_steps 1000 --image_size 256 --learn_sigma True --noise_schedule linear --num_channels 256 --num_head_channels 64 --num_res_blocks 2 --resblock_updown True --use_fp16 True --use_scale_shift_norm True"
      mpiexec -n [number of gpus] python python_scripts/generate_dataset.py --log_path [path for saving dataset] $MODEL_FLAGS $SAMPLE_FLAGS --gpus [Gpu ids] --model_path [diffusion_path]
      ```
-   - Instead of this, you can download generated data from ADM unconditional 256x256 diffusion model from [link]()
+   - Instead of this, you can download generated data from ADM unconditional 256x256 diffusion model from [link](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/gen_dataset.zip)
    - Then, this command will train PPAP with synthetic data.
       ```
       export PYTHONPATH=$PYTHONPATH:$(pwd)
@@ -177,7 +177,7 @@ experts [[0,200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CV
 Please refer [```deepfloyd_guidance_ppap.ipynb```](https://github.com/riiid/PPAP/blob/main/deepfloyd_guidance_ppap.ipynb), which contains examples for depth guidance with PPAP.
 
 ### F. Used dataset in DeepFloyd-IF PPAP
-The generated dataset produced in [B. Generate unconditional image dataset for PPAP.](#b-generate-unconditional-image-dataset-for-ppap) can be download in [link]().
+The generated dataset produced in [B. Generate unconditional image dataset for PPAP.](#b-generate-unconditional-image-dataset-for-ppap) can be download in [link](https://s3.console.aws.amazon.com/s3/object/riiid-st.airesearch?region=ap-northeast-2&prefix=CVPR2023_ppap_ckpt/gen_samples_IF.zip).
 
 ## BibTex
 ```
