@@ -177,7 +177,7 @@ experts [[0,200]](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CV
 Please refer [```deepfloyd_guidance_ppap.ipynb```](https://github.com/riiid/PPAP/blob/main/deepfloyd_guidance_ppap.ipynb), which contains examples for depth guidance with PPAP.
 
 ### F. Used dataset in DeepFloyd-IF PPAP
-The generated dataset produced in [B. Generate unconditional image dataset for PPAP.](#b-generate-unconditional-image-dataset-for-ppap) can be download in [link](https://s3.console.aws.amazon.com/s3/object/riiid-st.airesearch?region=ap-northeast-2&prefix=CVPR2023_ppap_ckpt/gen_samples_IF.zip).
+The generated dataset produced in [B. Generate unconditional image dataset for PPAP.](#b-generate-unconditional-image-dataset-for-ppap) can be download in [link](https://s3.ap-northeast-2.amazonaws.com/riiid-st.airesearch/CVPR2023_ppap_ckpt/gen_samples_IF.zip).
 
 ## BibTex
 ```
