@@ -13,7 +13,7 @@ This repository is based on following repositories with some modifications:
 ## Plan
 - [x] Release code.
 - [x] Make checkpoints available.
-- [ ] Make PPAP data available.
+- [x] Make PPAP data available.
 
 ## Requirements
 For distributed training, [MPICH](https://www.mpich.org/) should be installed with following commands.
